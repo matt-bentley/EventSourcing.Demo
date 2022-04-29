@@ -1,10 +1,9 @@
 ﻿using EventFlow.Aggregates.ExecutionResults;
 using EventFlow.Commands;
 using EventFlow.Demo.Application.Users.Services;
-using EventFlow.Demo.Core;
 using EventFlow.Demo.Core.Users.Entities;
 
-namespace EventFlow.Demo.Application.Users.Commands
+namespace EventFlow.Demo.Core.Users.Commands
 {
     public class UpdateEmailCommand : Command<User, Id, IExecutionResult>
     {

@@ -1,9 +1,8 @@
 ﻿using EventFlow.Aggregates.ExecutionResults;
 using EventFlow.Commands;
-using EventFlow.Demo.Core;
 using EventFlow.Demo.Core.Applications.Entities;
 
-namespace EventFlow.Demo.Application.Applications.Commands
+namespace EventFlow.Demo.Core.Applications.Commands
 {
     public class UpdateTeamMemberEmailCommand : Command<ApplicationEnvironment, Id, IExecutionResult>
     {

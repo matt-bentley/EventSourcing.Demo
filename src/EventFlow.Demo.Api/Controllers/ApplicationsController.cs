@@ -1,6 +1,6 @@
-using EventFlow.Demo.Application.Applications.Commands;
+using EventFlow.Demo.Core.Applications.Commands;
 using EventFlow.Demo.Application.Applications.Models;
-using EventFlow.Demo.Application.Applications.Queries;
+using EventFlow.Demo.Core.Applications.Queries;
 using EventFlow.Demo.Core.Abstractions.ReadModels;
 using EventFlow.Demo.Core.Applications.ReadModels;
 using EventFlow.Queries;

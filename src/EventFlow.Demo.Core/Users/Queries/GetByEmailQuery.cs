@@ -2,7 +2,7 @@
 using EventFlow.Demo.Core.Users.ReadModels;
 using EventFlow.Queries;
 
-namespace EventFlow.Demo.Application.Users.Queries
+namespace EventFlow.Demo.Core.Users.Queries
 {
     public record GetByEmailQuery(string Email) : IQuery<UserReadModel>;
 

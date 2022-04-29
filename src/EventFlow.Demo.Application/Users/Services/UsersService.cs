@@ -1,6 +1,6 @@
-﻿using EventFlow.Demo.Application.Users.Commands;
+﻿using EventFlow.Demo.Core.Users.Commands;
 using EventFlow.Demo.Application.Users.Models;
-using EventFlow.Demo.Application.Users.Queries;
+using EventFlow.Demo.Core.Users.Queries;
 using EventFlow.Demo.Core.Exceptions;
 using EventFlow.Demo.Core.Users.ReadModels;
 using EventFlow.Queries;

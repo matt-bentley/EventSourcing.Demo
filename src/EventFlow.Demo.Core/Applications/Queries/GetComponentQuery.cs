@@ -2,7 +2,7 @@
 using EventFlow.Demo.Core.Applications.ReadModels;
 using EventFlow.Queries;
 
-namespace EventFlow.Demo.Application.Applications.Queries
+namespace EventFlow.Demo.Core.Applications.Queries
 {
     public record GetComponentQuery(Guid ApplicationId, Guid ComponentId) : IQuery<ComponentReadModel>;
 

@@ -1,5 +1,5 @@
 ﻿using EventFlow.Aggregates;
-using EventFlow.Demo.Application.Applications.Commands;
+using EventFlow.Demo.Core.Applications.Commands;
 using EventFlow.Demo.Core;
 using EventFlow.Demo.Core.Abstractions.Repositories;
 using EventFlow.Demo.Core.Applications.ReadModels;

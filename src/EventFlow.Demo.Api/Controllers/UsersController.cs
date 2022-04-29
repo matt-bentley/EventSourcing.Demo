@@ -1,5 +1,5 @@
 using EventFlow.Demo.Application.Users.Models;
-using EventFlow.Demo.Application.Users.Queries;
+using EventFlow.Demo.Core.Users.Queries;
 using EventFlow.Demo.Application.Users.Services;
 using EventFlow.Demo.Core.Abstractions.ReadModels;
 using EventFlow.Demo.Core.Users.ReadModels;

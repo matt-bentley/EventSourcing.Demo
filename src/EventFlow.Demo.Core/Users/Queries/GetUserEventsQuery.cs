@@ -3,7 +3,7 @@ using EventFlow.Demo.Core.Abstractions.Repositories;
 using EventFlow.Demo.Core.Users.Entities;
 using EventFlow.Queries;
 
-namespace EventFlow.Demo.Application.Users.Queries
+namespace EventFlow.Demo.Core.Users.Queries
 {
     public record GetUserEventsQuery(Guid Id) : IQuery<List<CommittedDomainEvent>>;
 

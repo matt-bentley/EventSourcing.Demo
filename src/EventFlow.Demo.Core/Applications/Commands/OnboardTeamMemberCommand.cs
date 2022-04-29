@@ -1,12 +1,11 @@
 ﻿using EventFlow.Aggregates.ExecutionResults;
 using EventFlow.Commands;
-using EventFlow.Demo.Core;
 using EventFlow.Demo.Core.Abstractions.Repositories;
 using EventFlow.Demo.Core.Applications.Entities;
 using EventFlow.Demo.Core.Exceptions;
 using EventFlow.Demo.Core.Users.ReadModels;
 
-namespace EventFlow.Demo.Application.Applications.Commands
+namespace EventFlow.Demo.Core.Applications.Commands
 {
     public class OnboardTeamMemberCommand : Command<ApplicationEnvironment, Id, IExecutionResult>
     {

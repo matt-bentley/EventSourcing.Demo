@@ -4,7 +4,6 @@ using EventFlow;
 using EventFlow.AspNetCore.Extensions;
 using EventFlow.Autofac.Extensions;
 using EventFlow.Demo.Api.Infrastructure.Filters;
-using EventFlow.Demo.Application.Applications.Commands;
 using EventFlow.Demo.Application.AutofacModules;
 using EventFlow.Demo.Application.Behaviours;
 using EventFlow.Demo.Core.Applications.Entities;
@@ -18,6 +17,7 @@ using EventFlow.EntityFramework;
 using EventFlow.EntityFramework.Extensions;
 using EventFlow.Extensions;
 using Microsoft.EntityFrameworkCore;
+using EventFlow.Demo.Application.Applications.Subscriptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +40,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
                     .AddAspNetCore()
                     .RegisterServices(sr => sr.Decorate<ICommandBus>((r, cb) => new ValidatingCommandBus(cb)))
                     .AddDefaults(typeof(ApplicationEnvironment).Assembly)
-                    .AddDefaults(typeof(CreateApplicationEnvironmentCommand).Assembly)
+                    .AddDefaults(typeof(ApplicationEmailUpdatedSubscription).Assembly)
                     .UseEntityFrameworkEventStore<DemoContext>()
                     .UseEntityFrameworkReadModel<UserReadModel, DemoContext>()
                     .UseEntityFrameworkReadModel<ApplicationReadModel, DemoContext>()
