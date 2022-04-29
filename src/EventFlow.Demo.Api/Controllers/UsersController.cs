@@ -1,6 +1,6 @@
-using EventFlow.Demo.Application.Users.Commands;
 using EventFlow.Demo.Application.Users.Models;
 using EventFlow.Demo.Application.Users.Queries;
+using EventFlow.Demo.Application.Users.Services;
 using EventFlow.Demo.Core.Abstractions.ReadModels;
 using EventFlow.Demo.Core.Users.ReadModels;
 using EventFlow.Queries;
@@ -15,14 +15,17 @@ namespace EventFlow.Demo.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly ICommandBus _commandBus;
         private readonly IQueryProcessor _queryProcessor;
+        private readonly IUsersService _usersService;
 
         public UsersController(ILogger<UsersController> logger,
             ICommandBus commandBus,
-            IQueryProcessor queryProcessor)
+            IQueryProcessor queryProcessor,
+            IUsersService usersService)
         {
             _logger = logger;
             _commandBus = commandBus;
             _queryProcessor = queryProcessor;
+            _usersService = usersService;
         }
 
         [HttpGet("{id}")]
@@ -48,8 +51,8 @@ namespace EventFlow.Demo.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByEmail(string email)
         {
-            var exampleReadModel = await _queryProcessor.ProcessAsync(new GetByEmailQuery(email), CancellationToken.None);
-            return Ok(exampleReadModel);
+            var user = await _usersService.GetByEmailAsync(email);
+            return Ok(user);
         }
 
         [HttpPut("{id}/email")]
@@ -58,7 +61,7 @@ namespace EventFlow.Demo.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateEmail(Guid id, [FromBody] EmailUpdateDto emailUpdate)
         {
-            await _commandBus.PublishAsync(new UpdateEmailCommand(id, emailUpdate.Email), CancellationToken.None);
+            await _usersService.UpdateEmailAsync(id, emailUpdate.Email);
             return NoContent();
         }
 
@@ -67,8 +70,7 @@ namespace EventFlow.Demo.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Post([FromBody] UserCreateDto userCreate)
         {
-            var id = Guid.NewGuid();
-            var executionResult = await _commandBus.PublishAsync(new CreateUserCommand(id, userCreate.FirstName, userCreate.LastName, userCreate.Email), CancellationToken.None);
+            var id = await _usersService.CreateAsync(userCreate);
             return CreatedAtAction(nameof(Get), new { id = id }, id);
         }
     }

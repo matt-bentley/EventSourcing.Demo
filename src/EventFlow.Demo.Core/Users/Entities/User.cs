@@ -2,7 +2,6 @@
 using EventFlow.Aggregates.ExecutionResults;
 using EventFlow.Demo.Core.Users.DomainEvents;
 using EventFlow.Demo.Core.Users.Entities.ValueObjects;
-using System.Net.Mail;
 
 namespace EventFlow.Demo.Core.Users.Entities
 {
@@ -33,9 +32,6 @@ namespace EventFlow.Demo.Core.Users.Entities
             if (string.IsNullOrEmpty(email))
                 return ExecutionResult.Failed("Email is required");
 
-            if (!IsValidEmail(email))
-                return ExecutionResult.Failed("Invalid email");
-
             Emit(new UserJoinedEvent(firstName, lastName, email));
 
             return ExecutionResult.Success();
@@ -44,9 +40,6 @@ namespace EventFlow.Demo.Core.Users.Entities
         public IExecutionResult UpdateEmail(string email)
         {
             email = Denormalize(email);
-
-            if (!IsValidEmail(email))
-                return ExecutionResult.Failed("Invalid email");
 
             Emit(new EmailUpdatedEvent(email));
 
@@ -67,20 +60,6 @@ namespace EventFlow.Demo.Core.Users.Entities
         private string Denormalize(string value)
         {
             return value?.Trim().ToLower();
-        }
-
-        private bool IsValidEmail(string email)
-        {
-            bool valid = true;
-            try
-            {
-                var mailUser = new MailAddress(email);
-            }
-            catch
-            {
-                valid = false;
-            }
-            return valid;
         }
     }
 }

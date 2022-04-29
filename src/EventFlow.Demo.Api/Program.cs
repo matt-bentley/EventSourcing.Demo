@@ -5,6 +5,7 @@ using EventFlow.AspNetCore.Extensions;
 using EventFlow.Autofac.Extensions;
 using EventFlow.Demo.Api.Infrastructure.Filters;
 using EventFlow.Demo.Application.Applications.Commands;
+using EventFlow.Demo.Application.AutofacModules;
 using EventFlow.Demo.Application.Behaviours;
 using EventFlow.Demo.Core.Applications.Entities;
 using EventFlow.Demo.Core.Applications.ReadModels;
@@ -31,6 +32,7 @@ builder.Services.AddSwaggerGen();
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     containerBuilder.RegisterModule(new CoreModule());
+    containerBuilder.RegisterModule(new ApplicationModule());
     containerBuilder.RegisterModule(new InfrastructureModule(builder.Configuration));
 
     EventFlowOptions.New

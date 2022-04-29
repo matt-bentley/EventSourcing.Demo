@@ -1,26 +1,26 @@
-﻿using EventFlow.Demo.Core.Abstractions.Repositories;
-using EventFlow.Demo.Core.Users.ReadModels;
+﻿using System.Net.Mail;
 
 namespace EventFlow.Demo.Application.Users.Services
 {
     public class UserValidationService : IUserValidationService
     {
-        private readonly IReadModelRepository<UserReadModel> _usersRepository;
-
-        public UserValidationService(IReadModelRepository<UserReadModel> usersRepository)
+        public bool IsValidEmail(string email)
         {
-            _usersRepository = usersRepository;
-        }
-
-        public async Task<bool> EmailExists(string email)
-        {
-            var existingUser = await _usersRepository.FirstOrDefaultAsync(x => x.Email == email.Trim().ToLower());
-            return existingUser != null;
+            bool valid = true;
+            try
+            {
+                var mailUser = new MailAddress(email);
+            }
+            catch
+            {
+                valid = false;
+            }
+            return valid;
         }
     }
 
     public interface IUserValidationService
     {
-        Task<bool> EmailExists(string email);
+        bool IsValidEmail(string email);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Autofac;
 
-namespace EventFlow.Demo.Core.AutofacModules
+namespace EventFlow.Demo.Application.AutofacModules
 {
-    public class CoreModule : Module
+    public class ApplicationModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

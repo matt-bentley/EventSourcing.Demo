@@ -29,16 +29,16 @@ namespace EventFlow.Demo.Application.Users.Commands
             _userValidationService = userValidationService;
         }
 
-        public override async Task<IExecutionResult> ExecuteCommandAsync(User aggregate,
+        public override Task<IExecutionResult> ExecuteCommandAsync(User aggregate,
             CreateUserCommand command,
             CancellationToken cancellationToken)
         {
-            if(await _userValidationService.EmailExists(command.Email))
+            if(!_userValidationService.IsValidEmail(command.Email))
             {
-                return ExecutionResult.Failed($"User already exists with email: {command.Email}");
+                return Task.FromResult(ExecutionResult.Failed("Invalid email"));
             }
             var executionResult = aggregate.Create(command.FirstName, command.LastName, command.Email);
-            return executionResult;
+            return Task.FromResult(executionResult);
         }
     }
 }
