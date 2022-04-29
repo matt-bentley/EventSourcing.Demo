@@ -9,11 +9,14 @@ namespace EventFlow.Demo.Core.Applications.ReadModels
     public class ApplicationReadModel : ReadModel, 
         IAmReadModelFor<ApplicationEnvironment, Id, ApplicationEnvironmentCreatedEvent>,
         IAmReadModelFor<ApplicationEnvironment, Id, ComponentRegisteredEvent>,
-        IAmReadModelFor<ApplicationEnvironment, Id, ComponentRemovedEvent>
+        IAmReadModelFor<ApplicationEnvironment, Id, ComponentRemovedEvent>,
+        IAmReadModelFor<ApplicationEnvironment, Id, TeamMemberOnboardedEvent>,
+        IAmReadModelFor<ApplicationEnvironment, Id, TeamMemberOffboardedEvent>
     {
         public string Name { get; set; }
         public string EnvironmentName { get; set; }
         public List<ComponentReadModel> Components { get; set; } = new List<ComponentReadModel>();
+        public List<TeamMemberReadModel> Team { get; set; } = new List<TeamMemberReadModel>();
 
         public void Apply(IReadModelContext context, IDomainEvent<ApplicationEnvironment, Id, ApplicationEnvironmentCreatedEvent> domainEvent)
         {
@@ -35,6 +38,20 @@ namespace EventFlow.Demo.Core.Applications.ReadModels
         public void Apply(IReadModelContext context, IDomainEvent<ApplicationEnvironment, Id, ComponentRemovedEvent> domainEvent)
         {
             Components.RemoveAll(e => e.Id == domainEvent.AggregateEvent.ComponentId.Value);
+        }
+
+        public void Apply(IReadModelContext context, IDomainEvent<ApplicationEnvironment, Id, TeamMemberOnboardedEvent> domainEvent)
+        {
+            Team.Add(new TeamMemberReadModel()
+            {
+                Email = domainEvent.AggregateEvent.Email,
+                UserId = domainEvent.AggregateEvent.UserId,
+            });
+        }
+
+        public void Apply(IReadModelContext context, IDomainEvent<ApplicationEnvironment, Id, TeamMemberOffboardedEvent> domainEvent)
+        {
+            Team.RemoveAll(e => e.UserId == domainEvent.AggregateEvent.UserId);
         }
     }
 }

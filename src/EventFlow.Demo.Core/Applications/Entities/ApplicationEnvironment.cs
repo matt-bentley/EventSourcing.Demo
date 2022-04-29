@@ -2,19 +2,25 @@
 using EventFlow.Aggregates.ExecutionResults;
 using EventFlow.Demo.Core.Abstractions.ExecutionResults;
 using EventFlow.Demo.Core.Applications.DomainEvents;
+using EventFlow.Demo.Core.Applications.Entities.ValueObjects;
 
 namespace EventFlow.Demo.Core.Applications.Entities
 {
     public class ApplicationEnvironment : AggregateRoot<ApplicationEnvironment, Id>,
         IEmit<ApplicationEnvironmentCreatedEvent>,
         IEmit<ComponentRegisteredEvent>,
-        IEmit<ComponentRemovedEvent>
+        IEmit<ComponentRemovedEvent>,
+        IEmit<TeamMemberOnboardedEvent>,
+        IEmit<TeamMemberOffboardedEvent>
     {
         public string ApplicationName { get; private set; }
         public string EnvironmentName { get; private set; }
 
         private readonly List<Component> _components = new List<Component>();
         public IReadOnlyCollection<Component> Components => _components.AsReadOnly();
+
+        private readonly HashSet<TeamMember> _team = new HashSet<TeamMember>();
+        public IReadOnlyCollection<TeamMember> Team => _team;
 
         public ApplicationEnvironment(Id id) : base(id) { }
 
@@ -56,6 +62,26 @@ namespace EventFlow.Demo.Core.Applications.Entities
             return ExecutionResult.Success();
         }
 
+        public IExecutionResult OnboardTeamMember(Guid userId, string email)
+        {
+            if (_team.Any(e => e.UserId == userId))
+                return ExecutionResult.Failed($"{userId} already has access to the application");
+
+            Emit(new TeamMemberOnboardedEvent(userId, email));
+
+            return ExecutionResult.Success();
+        }
+
+        public IExecutionResult OffboardTeamMember(Guid userId)
+        {
+            if (!_team.Any(e => e.UserId == userId))
+                return ExecutionResult.Failed($"{userId} does not have access to the application");
+
+            Emit(new TeamMemberOffboardedEvent(userId));
+
+            return ExecutionResult.Success();
+        }
+
         public void Apply(ApplicationEnvironmentCreatedEvent @event)
         {
             ApplicationName = @event.ApplicationName;
@@ -71,6 +97,16 @@ namespace EventFlow.Demo.Core.Applications.Entities
         {
             var component = _components.FirstOrDefault(x => x.Id == @event.ComponentId);
             _components.Remove(component);
+        }
+
+        public void Apply(TeamMemberOnboardedEvent @event)
+        {
+            _team.Add(new TeamMember(@event.UserId, @event.Email));
+        }
+
+        public void Apply(TeamMemberOffboardedEvent @event)
+        {
+            _team.RemoveWhere(x => x.UserId == @event.UserId);
         }
     }
 }

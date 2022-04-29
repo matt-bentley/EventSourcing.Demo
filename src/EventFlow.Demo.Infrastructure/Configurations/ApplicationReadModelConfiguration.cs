@@ -12,7 +12,12 @@ namespace EventFlow.Demo.Infrastructure.Configurations
 
             builder.HasMany(e => e.Components)
                    .WithOne()
-                   .HasForeignKey(e => e.ApplicationId);
+                   .HasForeignKey(e => e.ApplicationId).IsRequired();
+
+            builder.OwnsMany(e => e.Team, team =>
+            {
+                team.WithOwner().HasForeignKey("ApplicationId");
+            });
         }
     }
 }

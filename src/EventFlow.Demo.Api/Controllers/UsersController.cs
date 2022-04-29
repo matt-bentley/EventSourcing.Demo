@@ -1,6 +1,7 @@
 using EventFlow.Demo.Application.Users.Commands;
 using EventFlow.Demo.Application.Users.Models;
 using EventFlow.Demo.Application.Users.Queries;
+using EventFlow.Demo.Core.Abstractions.ReadModels;
 using EventFlow.Demo.Core.Users.ReadModels;
 using EventFlow.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,15 @@ namespace EventFlow.Demo.Controllers
         {
             var exampleReadModel = await _queryProcessor.ProcessAsync(new ReadModelByIdQuery<UserReadModel>(id), CancellationToken.None);
             return Ok(exampleReadModel);
+        }
+
+        [HttpGet("{id}/events")]
+        [ProducesResponseType(typeof(List<CommittedDomainEvent>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetEvents(Guid id)
+        {
+            var events = await _queryProcessor.ProcessAsync(new GetUserEventsQuery(id), CancellationToken.None);
+            return Ok(events);
         }
 
         [HttpGet("email/{email}")]

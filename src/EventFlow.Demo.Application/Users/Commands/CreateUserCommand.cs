@@ -1,5 +1,6 @@
 ﻿using EventFlow.Aggregates.ExecutionResults;
 using EventFlow.Commands;
+using EventFlow.Demo.Application.Users.Services;
 using EventFlow.Demo.Core;
 using EventFlow.Demo.Core.Users.Entities;
 
@@ -21,12 +22,23 @@ namespace EventFlow.Demo.Application.Users.Commands
 
     public class CreateUserCommandHandler : CommandHandler<User, Id, IExecutionResult, CreateUserCommand>
     {
-        public override Task<IExecutionResult> ExecuteCommandAsync(User aggregate,
+        private readonly IUserValidationService _userValidationService;
+
+        public CreateUserCommandHandler(IUserValidationService userValidationService)
+        {
+            _userValidationService = userValidationService;
+        }
+
+        public override async Task<IExecutionResult> ExecuteCommandAsync(User aggregate,
             CreateUserCommand command,
             CancellationToken cancellationToken)
         {
+            if(await _userValidationService.EmailExists(command.Email))
+            {
+                return ExecutionResult.Failed($"User already exists with email: {command.Email}");
+            }
             var executionResult = aggregate.Create(command.FirstName, command.LastName, command.Email);
-            return Task.FromResult(executionResult);
+            return executionResult;
         }
     }
 }

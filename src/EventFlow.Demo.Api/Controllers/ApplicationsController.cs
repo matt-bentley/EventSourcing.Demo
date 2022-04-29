@@ -1,8 +1,7 @@
 using EventFlow.Demo.Application.Applications.Commands;
 using EventFlow.Demo.Application.Applications.Models;
 using EventFlow.Demo.Application.Applications.Queries;
-using EventFlow.Demo.Core;
-using EventFlow.Demo.Core.Applications.Entities;
+using EventFlow.Demo.Core.Abstractions.ReadModels;
 using EventFlow.Demo.Core.Applications.ReadModels;
 using EventFlow.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +26,14 @@ namespace EventFlow.Demo.Controllers
             _queryProcessor = queryProcessor;
         }
 
+        [HttpGet()]
+        [ProducesResponseType(typeof(List<ApplicationSummaryReadModel>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Get()
+        {
+            var applications = await _queryProcessor.ProcessAsync(new GetApplicationSummariesQuery(), CancellationToken.None);
+            return Ok(applications);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ApplicationReadModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -38,6 +45,15 @@ namespace EventFlow.Demo.Controllers
                 return NotFound();
             }
             return Ok(application);
+        }
+
+        [HttpGet("{id}/events")]
+        [ProducesResponseType(typeof(List<CommittedDomainEvent>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetEvents(Guid id)
+        {
+            var events = await _queryProcessor.ProcessAsync(new GetApplicationEventsQuery(id), CancellationToken.None);
+            return Ok(events);
         }
 
         [HttpPost]
@@ -79,6 +95,25 @@ namespace EventFlow.Demo.Controllers
         public async Task<IActionResult> DeleteComponent(Guid id, Guid componentId)
         {
             await _commandBus.PublishAsync(new RemoveComponentCommand(id, componentId), CancellationToken.None);
+            return NoContent();
+        }
+
+        [HttpPut("{id}/team/onboard/{userId}")]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> OnboardTeamMember(Guid id, Guid userId)
+        {
+            await _commandBus.PublishAsync(new OnboardTeamMemberCommand(id, userId), CancellationToken.None);
+            return NoContent();
+        }
+
+        [HttpPut("{id}/team/offboard/{userId}")]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> OffboardTeamMember(Guid id, Guid userId)
+        {
+            await _commandBus.PublishAsync(new OffboardTeamMemberCommand(id, userId), CancellationToken.None);
             return NoContent();
         }
     }

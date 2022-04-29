@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventFlow.Demo.Infrastructure.Migrations
 {
     [DbContext(typeof(DemoContext))]
-    [Migration("20220427070824_Initialise")]
+    [Migration("20220429070753_Initialise")]
     partial class Initialise
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,12 +37,29 @@ namespace EventFlow.Demo.Infrastructure.Migrations
                     b.ToTable("Applications");
                 });
 
+            modelBuilder.Entity("EventFlow.Demo.Core.Applications.ReadModels.ApplicationSummaryReadModel", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EnvironmentName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApplicationSummaries");
+                });
+
             modelBuilder.Entity("EventFlow.Demo.Core.Applications.ReadModels.ComponentReadModel", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ApplicationId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
@@ -64,7 +81,7 @@ namespace EventFlow.Demo.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
@@ -73,6 +90,10 @@ namespace EventFlow.Demo.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
 
                     b.ToTable("Users");
                 });
@@ -111,11 +132,42 @@ namespace EventFlow.Demo.Infrastructure.Migrations
                     b.ToTable("EventEntity");
                 });
 
+            modelBuilder.Entity("EventFlow.Demo.Core.Applications.ReadModels.ApplicationReadModel", b =>
+                {
+                    b.OwnsMany("EventFlow.Demo.Core.Applications.ReadModels.TeamMemberReadModel", "Team", b1 =>
+                        {
+                            b1.Property<string>("ApplicationId")
+                                .HasColumnType("nvarchar(450)");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("Email")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<Guid>("UserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("ApplicationId", "Id");
+
+                            b1.ToTable("TeamMembers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ApplicationId");
+                        });
+
+                    b.Navigation("Team");
+                });
+
             modelBuilder.Entity("EventFlow.Demo.Core.Applications.ReadModels.ComponentReadModel", b =>
                 {
                     b.HasOne("EventFlow.Demo.Core.Applications.ReadModels.ApplicationReadModel", null)
                         .WithMany("Components")
-                        .HasForeignKey("ApplicationId");
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EventFlow.Demo.Core.Applications.ReadModels.ApplicationReadModel", b =>

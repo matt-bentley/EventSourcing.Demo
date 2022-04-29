@@ -13,7 +13,9 @@ namespace EventFlow.Demo.Infrastructure
         }
 
         public DbSet<ApplicationReadModel> Applications { get; set; }
+        public DbSet<ApplicationSummaryReadModel> ApplicationSummaries { get; set; }
         public DbSet<ComponentReadModel> Components { get; set; }
+        public DbSet<TeamMemberReadModel> TeamMembers { get; set; }
 
 
         public DbSet<UserReadModel> Users { get; set; }

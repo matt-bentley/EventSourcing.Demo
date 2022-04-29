@@ -8,6 +8,7 @@ using EventFlow.Demo.Application.Applications.Commands;
 using EventFlow.Demo.Application.Behaviours;
 using EventFlow.Demo.Core.Applications.Entities;
 using EventFlow.Demo.Core.Applications.ReadModels;
+using EventFlow.Demo.Core.AutofacModules;
 using EventFlow.Demo.Core.Users.ReadModels;
 using EventFlow.Demo.Infrastructure;
 using EventFlow.Demo.Infrastructure.AutofacModules;
@@ -29,6 +30,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
+    containerBuilder.RegisterModule(new CoreModule());
     containerBuilder.RegisterModule(new InfrastructureModule(builder.Configuration));
 
     EventFlowOptions.New
@@ -40,6 +42,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
                     .UseEntityFrameworkEventStore<DemoContext>()
                     .UseEntityFrameworkReadModel<UserReadModel, DemoContext>()
                     .UseEntityFrameworkReadModel<ApplicationReadModel, DemoContext>()
+                    .UseEntityFrameworkReadModel<ApplicationSummaryReadModel, DemoContext>()
                     .ConfigureEntityFramework(EntityFrameworkConfiguration.New)
                     .AddDbContextProvider<DemoContext, DemoContextProvider>();
 });

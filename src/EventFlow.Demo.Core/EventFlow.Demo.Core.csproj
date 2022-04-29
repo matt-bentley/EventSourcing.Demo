@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="EventFlow" Version="0.83.4713" />
   </ItemGroup>
 

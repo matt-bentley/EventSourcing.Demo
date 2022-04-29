@@ -33,6 +33,9 @@ namespace EventFlow.Demo.Infrastructure.AutofacModules
 
             builder.RegisterGeneric(typeof(ReadModelRepository<>))
                 .As(typeof(IReadModelRepository<>));
+
+            builder.RegisterType<EventsRepository>()
+                .AsImplementedInterfaces();
         }
     }
 }
