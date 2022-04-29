@@ -19,5 +19,10 @@ namespace EventFlow.Demo.Core.Applications.Entities.ValueObjects
             UserId = userId;
             Email = email.ToLower();
         }
+
+        public TeamMember UpdateEmail(string email)
+        {
+            return new TeamMember(UserId, email);
+        }
     }
 }

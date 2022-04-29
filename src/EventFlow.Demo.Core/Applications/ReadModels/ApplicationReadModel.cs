@@ -11,7 +11,8 @@ namespace EventFlow.Demo.Core.Applications.ReadModels
         IAmReadModelFor<ApplicationEnvironment, Id, ComponentRegisteredEvent>,
         IAmReadModelFor<ApplicationEnvironment, Id, ComponentRemovedEvent>,
         IAmReadModelFor<ApplicationEnvironment, Id, TeamMemberOnboardedEvent>,
-        IAmReadModelFor<ApplicationEnvironment, Id, TeamMemberOffboardedEvent>
+        IAmReadModelFor<ApplicationEnvironment, Id, TeamMemberOffboardedEvent>,
+        IAmReadModelFor<ApplicationEnvironment, Id, TeamMemberEmailUpdatedEvent>
     {
         public string Name { get; set; }
         public string EnvironmentName { get; set; }
@@ -52,6 +53,12 @@ namespace EventFlow.Demo.Core.Applications.ReadModels
         public void Apply(IReadModelContext context, IDomainEvent<ApplicationEnvironment, Id, TeamMemberOffboardedEvent> domainEvent)
         {
             Team.RemoveAll(e => e.UserId == domainEvent.AggregateEvent.UserId);
+        }
+
+        public void Apply(IReadModelContext context, IDomainEvent<ApplicationEnvironment, Id, TeamMemberEmailUpdatedEvent> domainEvent)
+        {
+            var teamMember = Team.First(e => e.UserId == domainEvent.AggregateEvent.UserId);
+            teamMember.Email = domainEvent.AggregateEvent.Email;
         }
     }
 }

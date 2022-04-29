@@ -11,7 +11,8 @@ namespace EventFlow.Demo.Core.Applications.Entities
         IEmit<ComponentRegisteredEvent>,
         IEmit<ComponentRemovedEvent>,
         IEmit<TeamMemberOnboardedEvent>,
-        IEmit<TeamMemberOffboardedEvent>
+        IEmit<TeamMemberOffboardedEvent>,
+        IEmit<TeamMemberEmailUpdatedEvent>
     {
         public string ApplicationName { get; private set; }
         public string EnvironmentName { get; private set; }
@@ -19,8 +20,8 @@ namespace EventFlow.Demo.Core.Applications.Entities
         private readonly List<Component> _components = new List<Component>();
         public IReadOnlyCollection<Component> Components => _components.AsReadOnly();
 
-        private readonly HashSet<TeamMember> _team = new HashSet<TeamMember>();
-        public IReadOnlyCollection<TeamMember> Team => _team;
+        private readonly List<TeamMember> _team = new List<TeamMember>();
+        public IReadOnlyCollection<TeamMember> Team => _team.AsReadOnly();
 
         public ApplicationEnvironment(Id id) : base(id) { }
 
@@ -82,6 +83,16 @@ namespace EventFlow.Demo.Core.Applications.Entities
             return ExecutionResult.Success();
         }
 
+        public IExecutionResult UpdateTeamMemberEmail(Guid userId, string email)
+        {
+            if (!_team.Any(e => e.UserId == userId))
+                return ExecutionResult.Failed($"{userId} does not have access to the application");
+
+            Emit(new TeamMemberEmailUpdatedEvent(userId, email));
+
+            return ExecutionResult.Success();
+        }
+
         public void Apply(ApplicationEnvironmentCreatedEvent @event)
         {
             ApplicationName = @event.ApplicationName;
@@ -106,7 +117,13 @@ namespace EventFlow.Demo.Core.Applications.Entities
 
         public void Apply(TeamMemberOffboardedEvent @event)
         {
-            _team.RemoveWhere(x => x.UserId == @event.UserId);
+            _team.RemoveAll(x => x.UserId == @event.UserId);
+        }
+
+        public void Apply(TeamMemberEmailUpdatedEvent @event)
+        {
+            var teamMemberIndex = _team.FindIndex(e => e.UserId == @event.UserId);
+            _team[teamMemberIndex] = _team[teamMemberIndex].UpdateEmail(@event.Email);
         }
     }
 }
