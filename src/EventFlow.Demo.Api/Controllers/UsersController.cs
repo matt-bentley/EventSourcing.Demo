@@ -52,6 +52,16 @@ namespace EventFlow.Demo.Controllers
             return Ok(exampleReadModel);
         }
 
+        [HttpPut("{id}/email")]
+        [ProducesResponseType(typeof(UserReadModel), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(UserReadModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateEmail(Guid id, [FromBody] EmailUpdateDto emailUpdate)
+        {
+            await _commandBus.PublishAsync(new UpdateEmailCommand(id, emailUpdate.Email), CancellationToken.None);
+            return NoContent();
+        }
+
         [HttpPost]
         [ProducesResponseType(typeof(string), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

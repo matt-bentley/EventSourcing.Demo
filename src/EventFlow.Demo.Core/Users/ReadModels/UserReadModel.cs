@@ -6,7 +6,9 @@ using EventFlow.ReadStores;
 
 namespace EventFlow.Demo.Core.Users.ReadModels
 {
-    public class UserReadModel : ReadModel, IAmReadModelFor<User, Id, UserJoinedEvent>
+    public class UserReadModel : ReadModel, 
+        IAmReadModelFor<User, Id, UserJoinedEvent>,
+        IAmReadModelFor<User, Id, EmailUpdatedEvent>
     {
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
@@ -17,6 +19,11 @@ namespace EventFlow.Demo.Core.Users.ReadModels
             Id = domainEvent.AggregateIdentity.Value;
             FirstName = domainEvent.AggregateEvent.FirstName;
             LastName = domainEvent.AggregateEvent.LastName;
+            Email = domainEvent.AggregateEvent.Email;
+        }
+
+        public void Apply(IReadModelContext context, IDomainEvent<User, Id, EmailUpdatedEvent> domainEvent)
+        {
             Email = domainEvent.AggregateEvent.Email;
         }
     }

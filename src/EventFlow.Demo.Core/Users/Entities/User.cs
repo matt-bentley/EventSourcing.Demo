@@ -7,7 +7,8 @@ using System.Net.Mail;
 namespace EventFlow.Demo.Core.Users.Entities
 {
     public class User : AggregateRoot<User, Id>,
-        IEmit<UserJoinedEvent>
+        IEmit<UserJoinedEvent>,
+        IEmit<EmailUpdatedEvent>
     {
         public UserDetails UserDetails { get; private set; }
         public string Email { get; private set; }
@@ -18,7 +19,7 @@ namespace EventFlow.Demo.Core.Users.Entities
 
         public IExecutionResult Create(string firstName, string lastName, string email)
         {
-            email = email.Trim();
+            email = Denormalize(email);
 
             try
             {
@@ -35,7 +36,19 @@ namespace EventFlow.Demo.Core.Users.Entities
             if (!IsValidEmail(email))
                 return ExecutionResult.Failed("Invalid email");
 
-            Emit(new UserJoinedEvent(firstName, lastName, email.ToLower()));
+            Emit(new UserJoinedEvent(firstName, lastName, email));
+
+            return ExecutionResult.Success();
+        }
+
+        public IExecutionResult UpdateEmail(string email)
+        {
+            email = Denormalize(email);
+
+            if (!IsValidEmail(email))
+                return ExecutionResult.Failed("Invalid email");
+
+            Emit(new EmailUpdatedEvent(email));
 
             return ExecutionResult.Success();
         }
@@ -44,6 +57,16 @@ namespace EventFlow.Demo.Core.Users.Entities
         {
             UserDetails = new UserDetails(@event.FirstName, @event.LastName);
             Email = @event.Email;
+        }
+
+        public void Apply(EmailUpdatedEvent @event)
+        {
+            Email = @event.Email;
+        }
+
+        private string Denormalize(string value)
+        {
+            return value?.Trim().ToLower();
         }
 
         private bool IsValidEmail(string email)
